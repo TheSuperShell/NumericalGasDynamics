@@ -3,7 +3,19 @@ import numpy as np
 from data import GasData2D, Parameters2D
 
 
-def hll(f_l, f_r, q_l, q_r, a_l, a_r, u_l, u_r):
+def hll(f_l, f_r, q_l, q_r, a_l, a_r, u_l, u_r) -> np.array:
+	"""
+	HLL method of solving arbitrary discontinuity
+	:param f_l: flow
+	:param f_r: flow with shift to right
+	:param q_l: q
+	:param q_r: q with shift to right
+	:param a_l: a
+	:param a_r: a with shift to right
+	:param u_l: u
+	:param u_r: u with shift to right
+	:return: flow vector
+	"""
 	s_minus = np.min((u_r - a_r, u_l - a_l), axis=0)[:, None]
 	s_plus = np.max((u_l + a_l, u_r + a_r), axis=0)[:, None]
 
@@ -42,17 +54,21 @@ def second_order(params: GasData2D) -> np.array:
 	return hll(f_l, f_r, q_l, q_r, a_l, a_r, u_l, u_r)
 
 
-def get_diff(q: np.array, dx: float) -> np.array:
-	q_l = q[:-2]
-	q_m = q[1:-1]
-	q_r = q[2:]
-
-	a = (q_r - q_m) / dx
-	b = (q_m - q_l) / dx
-	return 0.5 * (np.sign(a) + np.sign(b)) * np.min((np.abs(a), np.abs(b)), axis=0)
-
-
 def get_edges(params: GasData2D):
+	"""
+	calculates parameters based on the slope on the edges of each volume
+	:param params: task parameters
+	:return: left edge parameters and right edge parameters
+	"""
+	def get_diff(q: np.array, dx: float) -> np.array:
+		q_l = q[:-2]
+		q_m = q[1:-1]
+		q_r = q[2:]
+
+		a = (q_r - q_m) / dx
+		b = (q_m - q_l) / dx
+		return 0.5 * (np.sign(a) + np.sign(b)) * np.min((np.abs(a), np.abs(b)), axis=0)
+
 	dp = get_diff(params.parameters.p, params.delta_x)
 	drho = get_diff(params.parameters.rho, params.delta_x)
 	du = get_diff(params.parameters.u, params.delta_x)
@@ -68,5 +84,3 @@ def get_edges(params: GasData2D):
 	params_l.update_energy()
 	params_r.update_energy()
 	return params_l, params_r
-
-

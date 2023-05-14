@@ -2,8 +2,8 @@ import json
 import os
 import warnings
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.animation import FuncAnimation
 
 
@@ -70,7 +70,8 @@ class Parameters2D:
 		return self
 
 	def get_f(self) -> np.array:
-		return np.array((self.rho * self.u, self.rho * self.u * self.u + self.p, (self.rho * self.E + self.p) * self.u)).T
+		return np.array(
+			(self.rho * self.u, self.rho * self.u * self.u + self.p, (self.rho * self.E + self.p) * self.u)).T
 
 	def get_g(self, r: np.array) -> np.array:
 		g1 = -self.rho * self.u / r
@@ -106,7 +107,6 @@ class Parameters2D:
 
 
 class GasData2D:
-
 	PARAMETERS = {
 		'p': 0,
 		'rho': 1,
@@ -224,7 +224,7 @@ class GasData2D:
 				raise FileNotFoundError(f'File for parameter {param_name} doesnt exist!')
 			parameter: np.array = self.parameters.get_parameter_by_name(param_name)
 			with open(path, 'ab') as f:
-				f.write(np.ascontiguousarray(parameter.data))
+				f.write(parameter.tobytes())
 
 	def delete_parameters(self):
 		self.parameters = self.init_parameters
@@ -236,7 +236,7 @@ class GasData2D:
 			path = os.path.join(self.file_path, param_name + '.param')
 			parameter = self.init_parameters.get_parameter_by_name(param_name)
 			with open(path, 'wb') as f:
-				f.write(np.ascontiguousarray(parameter.data))
+				f.write(parameter.tobytes())
 
 	def set_parameters(self, new_parameters: Parameters2D, dt: float, save: bool = True):
 		self.apply_boundary_conditions(new_parameters)
@@ -266,16 +266,17 @@ class GasData2D:
 
 	def get_dt(self) -> float:
 		a = self.parameters.get_a()
-		delta_t = np.zeros(self.Nx-2)
-		for j in range(1, self.Nx-1):
-			delta_t[j-1] = self.delta_x / np.max((np.abs(self.parameters.u[j] + a[j]), np.abs(self.parameters.u[j] - a[j])))
+		delta_t = np.zeros(self.Nx - 2)
+		for j in range(1, self.Nx - 1):
+			delta_t[j - 1] = self.delta_x / np.max(
+				(np.abs(self.parameters.u[j] + a[j]), np.abs(self.parameters.u[j] - a[j])))
 		return np.min(delta_t) * self.k
 
 	def draw_graphs(self, k=-1):
 		p_k = self.get_parameter_at_k('p', k)
 		rho_k = self.get_parameter_at_k('rho', k)
 		u_k = self.get_parameter_at_k('u', k)
-		E_k = self.get_parameter_at_k('E', k)
+		e_k = self.get_parameter_at_k('E', k)
 
 		plt.figure(figsize=(7, 4 * 4))
 
@@ -295,16 +296,16 @@ class GasData2D:
 		plt.ylabel(r"$u$, м/с")
 
 		plt.subplot(4, 1, 4)
-		plt.plot(self.x[1:self.Nx - 1], E_k[1:self.Nx - 1])
+		plt.plot(self.x[1:self.Nx - 1], e_k[1:self.Nx - 1])
 		plt.xlabel("$x$, м")
 		plt.ylabel(r"$E$, Дж/кг")
 		plt.show()
 
 	def time_base(self, xlims=(0, 1)):
 		rho = self.get_parameter_array('rho')
-		Nxlims = (int(np.floor(xlims[0] * self.Nx)) + 1, int(np.floor(xlims[1] * self.Nx)))
+		nxlims = (int(np.floor(xlims[0] * self.Nx)) + 1, int(np.floor(xlims[1] * self.Nx)))
 		im = plt.imshow(
-			rho[-1:0:-1, Nxlims[0]:Nxlims[1]],
+			rho[-1:0:-1, nxlims[0]:nxlims[1]],
 			cmap='plasma_r',
 			aspect='auto',
 			extent=[xlims[0] * self.L * 1000, xlims[1] * self.L * 1000, 0, float(self.get_time_array()[-1]) * 1000000]
