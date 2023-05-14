@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/FluidDinamics.iml" filepath="$PROJECT_DIR$/.idea/FluidDinamics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/NumericalGasDynamics.iml" filepath="$PROJECT_DIR$/.idea/NumericalGasDynamics.iml" />
     </modules>
   </component>
 </project>
