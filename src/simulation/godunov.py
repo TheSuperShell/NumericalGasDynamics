@@ -1,20 +1,24 @@
 from data import GasData2D, Parameters2D
 from energy_input import EnergyInput
-from arbitary_break import first_order
+from arbitary_break import first_order, get_edges
 import numpy as np
+from time import time
 
 
-def solve_numerically(q_k, f_k, dt, dx, g_k, t, energy_input: EnergyInput) -> np.array:
+def solve_numerically(q_k, f_k, dt, dx, g_k, x, t, energy_input: EnergyInput) -> np.array:
+	f_l = f_k[:-1]
+	f_r = f_k[1:]
+	return get_q_k1(q_k, f_l, f_r, dt, dx, g_k, x, t, energy_input)
+
+
+def get_q_k1(q_k, f_l, f_r, dt, dx, g_k, x, t, energy_input: EnergyInput) -> np.array:
 	q_k1 = q_k.copy()
-	N = q_k1.shape[0]
-	for j in range(1, N-1):
-		f_r = f_k[j]
-		f_l = f_k[j-1]
-		q_k1[j] = q_k[j] - dt / dx * (f_r - f_l) + g_k[j-1] * dt
-		if energy_input:
-			r = (j - 0.5) * dx
-			epsilon = np.array((0, 0, energy_input.get_energy_input(r, t)))
-			q_k1[j] += epsilon * dt
+	q_k1[1: -1] = q_k[1: -1] - dt / dx * (f_r - f_l) + g_k[1: -1] * dt
+	if energy_input:
+		N = q_k1.shape[0]
+		de = np.zeros((N, 3))
+		de[:, 2] = energy_input.get_energy_input(x, t)
+		q_k1 += de * dt
 	return q_k1
 
 
@@ -25,8 +29,14 @@ def step(params: GasData2D, dt: float, solver, rodionov: bool, energy_input: Ene
 	if params.cylindrical:
 		g_k = params.parameters.get_g(params.x)
 
-	f_k = solver(params)
-	q_k1 = solve_numerically(q_k, f_k, dt, params.delta_x, g_k, params.t, energy_input)
+	if rodionov:
+		edge_l, edge_r = get_edges(params)
+		f_r = edge_l.get_f()[1:-1]
+		f_l = edge_r.get_f()[1:-1]
+		q_k1 = get_q_k1(q_k, f_l, f_r, dt,params.delta_x, g_k, params.x, params.t, energy_input)
+	else:
+		f_k = solver(params)
+		q_k1 = solve_numerically(q_k, f_k, dt, params.delta_x, g_k, params.x, params.t, energy_input)
 
 	if params.cylindrical:
 		g_k1 = Parameters2D(N).reverse_q(q_k1).get_g(params.x)
@@ -39,7 +49,7 @@ def step(params: GasData2D, dt: float, solver, rodionov: bool, energy_input: Ene
 		f_k = solver(params)
 
 	if params.cylindrical or rodionov:
-		q_k1 = solve_numerically(q_k, f_k, dt, params.delta_x, g_k, params.t, energy_input)
+		q_k1 = solve_numerically(q_k, f_k, dt, params.delta_x, g_k, params.x, params.t, energy_input)
 
 	new_params = Parameters2D(N).reverse_q(q_k1)
 	params.set_parameters(new_params, dt)
@@ -54,11 +64,13 @@ def n_steps(
 		energy_input: EnergyInput = None,
 		verbose=100
 ):
+	start = time()
 	while params.Nt < max_nt:
 		if params.Nt % verbose == 0:
 			print(f'Loading: {params.Nt / max_nt:.1%}')
 		dt = params.delta_t * params.k if fixed_dt else params.get_dt()
 		step(params, dt, solver, rodionov, energy_input)
+	print(f'Finished in {time() - start:.4f} seconds')
 
 	params.draw_graphs()
 	params.time_base()

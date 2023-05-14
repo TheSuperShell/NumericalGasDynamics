@@ -42,6 +42,12 @@ class Parameters2D:
 	def get_all(self):
 		return self.p, self.rho, self.u, self.E
 
+	def copy_parameters(self, params):
+		self.p = params.p.copy()
+		self.rho = params.rho.copy()
+		self.u = params.u.copy()
+		return self
+
 	def const_parameter(self, param_name: str, value: float) -> None:
 		new_param = np.ones(len(self.p)) * value
 		self.set_parameter_by_name(param_name, new_param)

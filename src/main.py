@@ -3,17 +3,14 @@ from simulation.godunov import n_steps
 from simulation.arbitary_break import second_order
 from simulation.energy_input import HyperbolicEnergyInput
 import numpy as np
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
 
-	init_params = Parameters2D(1002)
-	init_params.const_parameter('p', 26600)
-	init_params.const_parameter('rho', 0.33)
-	init_params.update_energy()
+	data_1 = GasData2D('discharge')
+	#data_1.delete_parameters()
 
-	data_1 = GasData2D('discharge', 1000, 0.05, 0.3, cylindrical=True)
-	data_1.set_initial_parameters(init_params)
+	energy_input = HyperbolicEnergyInput(0, 0.000002, 100000, 0, 0.002)
 
-	energy_input = HyperbolicEnergyInput(0.0000005, 0.000002, 100000, 0, 0.002)
-
-	n_steps(data_1, 1000, False, solver=second_order, rodionov=True, energy_input=energy_input)
+	#n_steps(data_1, 1000, False, solver=second_order, rodionov=True, energy_input=energy_input)
+	data_1.save_gif('rho', skip=10)
