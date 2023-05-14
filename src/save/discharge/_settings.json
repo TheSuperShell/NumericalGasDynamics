@@ -1,0 +1,1 @@
+{"name": "discharge", "Nx": 1000, "L": 0.05, "k": 0.3, "boundary_conditions": ["closed", "closed"], "cylindrical": true}
