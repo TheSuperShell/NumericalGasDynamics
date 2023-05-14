@@ -67,10 +67,28 @@ def n_steps(
 	start = time()
 	while params.Nt < max_nt:
 		if params.Nt % verbose == 0:
-			print(f'Loading: {params.Nt / max_nt:.1%}')
+			print(f'Loading: {params.Nt / max_nt:.0%}')
 		dt = params.delta_t * params.k if fixed_dt else params.get_dt()
 		step(params, dt, solver, rodionov, energy_input)
 	print(f'Finished in {time() - start:.4f} seconds')
 
-	params.draw_graphs()
-	params.time_base()
+
+def t_steps(
+		params: GasData2D,
+		max_t: float,
+		fixed_dt: bool = False,
+		solver=first_order,
+		rodionov: bool = False,
+		energy_input: EnergyInput = None,
+		verbose = 100
+):
+	start = time()
+	timer = verbose
+	while params.t < max_t:
+		if timer == 0:
+			timer = verbose
+			print(f't = {params.t}. Left {params.t / max_t:.0%}')
+		timer -= 1
+		dt = params.delta_t * params.k if fixed_dt else params.get_dt()
+		step(params, dt, solver, rodionov, energy_input)
+	print(f'Finished in {time() - start:.4f} seconds')
