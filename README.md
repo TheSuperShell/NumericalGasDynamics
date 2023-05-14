@@ -11,11 +11,15 @@ $$
 плюс начальные и граничные условия. Здесь
 
 $$
-q = \begin{pmatrix} \rho\\ \rho u\\ \rho E \end{pmatrix}
+q = \begin{pmatrix} \rho\\
+\rho u\\
+\rho E \end{pmatrix}
 $$
 
 $$
-f = \begin{pmatrix} \rho u\\ \rho u^2 + p\\ (\rho E + p)u \end{pmatrix}
+f = \begin{pmatrix} \rho u\\
+\rho u^2 + p\\
+(\rho E + p)u \end{pmatrix}
 $$
 
 $$
@@ -103,7 +107,9 @@ $$
 ### Стенка
 
 $$
-\begin{cases} p_0 = p_1\\ \rho_0 = \rho_1\\ u_0 = -u_1 \end{cases}
+\begin{cases} p_0 = p_1\\
+\rho_0 = \rho_1\\
+u_0 = -u_1 \end{cases}
 $$
 
 Для правой границы аналогично. Такие условия гарантируют, что через границу не будет потоков
@@ -111,7 +117,9 @@ $$
 ### Открытая граница
 
 $$
-\begin{cases} p_0 = p_1\\ \rho_0 = \rho_1\\ u_0 = u_1 \end{cases}
+\begin{cases} p_0 = p_1\\
+\rho_0 = \rho_1\\
+u_0 = u_1 \end{cases}
 $$
 
 Для правой границы аналогично.
@@ -155,7 +163,11 @@ U = \begin{pmatrix} \rho u u & \rho u v & \rho u w\\
 $$
 
 $$
-q = \begin{pmatrix} \rho \\ \rho u \\ \rho v \\ \rho w \\ \rho E \end{pmatrix}
+q = \begin{pmatrix} \rho \\
+\rho u \\
+\rho v \\ 
+\rho w \\
+\rho E \end{pmatrix}
 $$
 
 Сводим ее к осесимметричной, цилиндрической задаче
@@ -177,7 +189,9 @@ $$
 Справа возникает неоднородность $g$. При переходе к схеме конечных объемов заменяем ее на
 
 $$
-g_j^k = \begin{pmatrix} -\frac{\rho u}{r}\\ -\frac{\rho u^2}{r}\\ \frac{(\rho E + p) u}{r} \end{pmatrix}
+g_j^k = \begin{pmatrix} -\frac{\rho u}{r}\\
+-\frac{\rho u^2}{r}\\
+\frac{(\rho E + p) u}{r} \end{pmatrix}
 $$
 
 а численная схема изменится на 
