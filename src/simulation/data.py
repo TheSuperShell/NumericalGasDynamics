@@ -42,6 +42,9 @@ class Parameters2D:
 	def get_all(self):
 		return self.p, self.rho, self.u, self.E
 
+	def copy(self):
+		return Parameters2D(self.p.shape[0], self.gamma).copy_parameters(self)
+
 	def copy_parameters(self, params):
 		self.p = params.p.copy()
 		self.rho = params.rho.copy()
@@ -70,8 +73,11 @@ class Parameters2D:
 		return self
 
 	def get_f(self) -> np.array:
-		return np.array(
-			(self.rho * self.u, self.rho * self.u * self.u + self.p, (self.rho * self.E + self.p) * self.u)).T
+		return np.array((
+			self.rho * self.u,
+			self.rho * self.u * self.u + self.p,
+			(self.rho * self.E + self.p) * self.u
+		)).T
 
 	def get_g(self, r: np.array) -> np.array:
 		g1 = -self.rho * self.u / r

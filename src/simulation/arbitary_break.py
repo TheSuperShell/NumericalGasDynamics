@@ -73,8 +73,8 @@ def get_edges(params: GasData2D):
 	drho = get_diff(params.parameters.rho, params.delta_x)
 	du = get_diff(params.parameters.u, params.delta_x)
 
-	params_l = Parameters2D(params.Nx).copy_parameters(params.parameters)
-	params_r = Parameters2D(params.Nx).copy_parameters(params.parameters)
+	params_l = params.parameters.copy() # Parameters2D(params.Nx).copy_parameters(params.parameters)
+	params_r = params.parameters.copy() # Parameters2D(params.Nx).copy_parameters(params.parameters)
 	params_l.p[1:-1] += dp * params.delta_x * 0.5
 	params_r.p[1:-1] -= dp * params.delta_x * 0.5
 	params_l.rho[1:-1] += drho * params.delta_x * 0.5
